@@ -19,14 +19,14 @@ img_blur = cv2.GaussianBlur(img_grey,(7,7),1)
 img_canny = cv2.Canny(img_blur,50,50)
 
 img_blank = np.zeros_like(img)
-img_contour = img.copy()
 
-def getContours(img,select_cors):
+
+def getContours(img,select_cors,color):
     #寻找外部结构
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        print(area)
+        # print(area)
 
         if area>500:
             # 绘制所有轮廓
@@ -41,13 +41,24 @@ def getContours(img,select_cors):
                 # 获取碰撞框
                 x,y,w,h = cv2.boundingRect(approx)
                 # 绘制正方形
-                cv2.rectangle(img_contour,(x,y),(x+w,y+h),(255,0,0))
+                cv2.rectangle(img_contour, (x, y), (x + w, y + h), color)
 
+                # 绘制文字
+                if len(approx) == 3 :
+                    cv2.putText(img_contour,"Tri",(x,y),cv2.FONT_HERSHEY_COMPLEX,1,color, 2)
+                elif len(approx) == 4 :
+                    cv2.putText(img_contour, "Box", (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, color, 2)
+                elif len(approx) >= 5:
+                    cv2.putText(img_contour, "Circle", (x, y), cv2.FONT_HERSHEY_COMPLEX, 1, color, 2)
 
+#查看图片
 while 1:
+    img_contour = img.copy()
 
     select_cors = cv2.getTrackbarPos("Shape Corners", "SelectShapeBar")
-    getContours(img_canny,select_cors)
+
+    color = (0,0,255)
+    getContours(img_canny,select_cors,color)
 
     showimages = stackImages(0.6,([img,img_grey,img_blur],[img_canny,img_contour,img_blank]))
     cv2.imshow("result",showimages)

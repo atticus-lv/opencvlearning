@@ -28,3 +28,5 @@ def readcam():
         cv2.imshow("camera",img)  # 显示图片
         if cv2.waitKey(1) & 0xFF == ord("q"):  #ord函数：将字符转回ASCII对应数值
             break
+
+# readcam()
